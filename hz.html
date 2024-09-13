@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉语新解</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --subtext-color: #666;
+            --container-bg-color: #fff;
+            --button-bg-color: #4CAF50;
+            --button-hover-bg-color: #45a049;
+            --input-border-color: #ddd;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .theme-switch {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--subtext-color);
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1 1 60%;
+            min-width: 200px;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            flex: 1 1 30%;
+            min-width: 100px;
+            padding: 10px;
+            background-color: var(--button-bg-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            word-break: break-word;
+            max-width: 100%;
+            overflow: auto;
+
+            width: 100%;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            padding: 10px;
+            text-align: center;
+            box-sizing: border-box;
+
+        }
+
+        .result svg {
+            width: 100%;
+            height: auto;
+            max-width: 90%;
+        }
+
+        footer {
+            text-align: center;
+            width: 100%;
+            padding: 20px 0;
+            box-sizing: border-box;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: transparent;
+            color: var(--text-color);
+            box-shadow: none;
+            border-top: 1px solid #ccc;
+        }
+
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                background-color: var(--container-bg-color);
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                max-width: 600px;
+                width: 100%;
+
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"] {
+                margin-right: 0;
+                height: auto;
+                margin-bottom: 10px;
+            }
+
+            button {
+                flex: 1 1 100%;
+                margin-top: 0;
+            }
+
+            .result {
+                width: 100%;
+                max-width: 100%;
+                overflow-wrap: auto;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            .result svg {
+                width: 55%;
+                height: auto;
+                max-width: 90%;
+                overflow-wrap: auto;
+                box-sizing: border-box;
+
+            }
+
+
+
+            #download-png-btn {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            footer {
+                position: relative;
+                padding-bottom: 30px;
+            }
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="theme-switch" onclick="toggleTheme()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2"></path>
+            <path d="M12 21v2"></path>
+            <path d="M4.22 4.22l1.42 1.42"></path>
+            <path d="M18.36 18.36l1.42 1.42"></path>
+            <path d="M1 12h2"></path>
+            <path d="M21 12h2"></path>
+            <path d="M4.22 19.78l1.42-1.42"></path>
+            <path d="M18.36 5.64l1.42-1.42"></path>
+        </svg>
+    </div>
+
+    <div class="container">
+        <h1>汉语新解</h1>
+        <p class="subtitle">将一个汉语词汇进行全新角度的解释</p>
+        <div class="input-group">
+            <input type="text" id="word-input" placeholder="说吧, 他们又用哪个词来忽悠你了?">
+            <button onclick="getInterpretation()">一针见血</button>
+        </div>
+        <div id="loader" class="loader"></div>
+        <div id="result" the result></div>
+        <button id="download-png-btn" style="display: none;" onclick="downloadPNG()">下载 PNG</button>
+    </div>
+    <footer>
+        &copy;
+        <script>document.write(new Date().getFullYear());</script> 李继刚 &amp; 小小小韩 | <a
+            href="https://github.com/hhy5562877/hanyuxinjie" target="_blank"
+            style="color: var(--text-color); text-decoration: none;">查看源代码</a>
+    </footer>
+
+    <script>
+        async function getInterpretation() {
+            const word = document.getElementById('word-input').value.trim();
+            const loader = document.getElementById('loader');
+            const result = document.getElementById('result');
+            const downloadBtn = document.getElementById('download-png-btn');
+
+            if (!word) {
+                alert('请输入一个汉语词汇！');
+                return;
+            }
+
+            loader.style.display = 'block';
+            result.innerHTML = '';
+
+            try {
+                const response = await fetch('hz.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `word=${encodeURIComponent(word)}`
+                });
+
+                if (!response.ok) {
+                    throw new Error(`服务器响应状态码：${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Full API Response:', data);
+
+                if (data.svg) {
+                    result.innerHTML = data.svg;
+                    downloadBtn.style.display = 'inline-block';
+                } else if (data.error) {
+                    result.textContent = data.error;
+                    console.error('Error from API:', data.error);
+                } else {
+                    result.textContent = "Unexpected response format.";
+                    console.error('Unexpected Response:', data);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                result.textContent = "获取解释时发生错误。请稍后再试。";
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+
+        function downloadPNG() {
+            const svgElement = document.getElementById('result').querySelector('svg');
+            if (!svgElement) {
+                alert('没有可下载的 SVG 内容。');
+                return;
+            }
+
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgElement);
+
+            if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+
+            const img = new Image();
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function () {
+                // 创建 Canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+
+                ctx.drawImage(img, 0, 0);
+
+                const imgURL = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imgURL;
+                downloadLink.download = 'hanzi.png';
+
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                URL.revokeObjectURL(url);
+            };
+
+            img.onerror = function () {
+                alert('将 SVG 转换为 PNG 失败。');
+                URL.revokeObjectURL(url);
+            };
+
+            img.src = url;
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.style.getPropertyValue('--bg-color') === '#f0f2f5' ? 'light' : 'dark';
+            if (currentTheme === 'dark') {
+                document.documentElement.style.setProperty('--bg-color', '#f0f2f5');
+                document.documentElement.style.setProperty('--text-color', '#333');
+                document.documentElement.style.setProperty('--subtext-color', '#666');
+                document.documentElement.style.setProperty('--container-bg-color', '#fff');
+                document.documentElement.style.setProperty('--button-bg-color', '#4CAF50');
+                document.documentElement.style.setProperty('--button-hover-bg-color', '#45a049');
+                document.documentElement.style.setProperty('--input-border-color', '#ddd');
+            } else {
+                document.documentElement.style.setProperty('--bg-color', '#333');
+                document.documentElement.style.setProperty('--text-color', '#f0f2f5');
+                document.documentElement.style.setProperty('--subtext-color', '#bbb');
+                document.documentElement.style.setProperty('--container-bg-color', '#424242');
+                document.documentElement.style.setProperty('--button-bg-color', '#5a9216');
+                document.documentElement.style.setProperty('--button-hover-bg-color', '#507d15');
+                document.documentElement.style.setProperty('--input-border-color', '#888');
+            }
+        }
+    </script>
+</body>
+
+</html>
